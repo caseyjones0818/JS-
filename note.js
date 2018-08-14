@@ -1,6 +1,5 @@
-# 第2章   在 HTML 中使用 JavaScript 
-# 第3章   基 本 概 念
 
+# 第3章   基 本 概 念
 局部变量
 function test(){
  var message = "hi"; // 局部变量
@@ -13,3 +12,10 @@ function test(){
 }
 test();
 alert(message); // "hi" 
+
+数据类型
+ECMAScript 中有 5 种简单数据类型（也称为基本数据类型）：Undefined、Null、Boolean、Number
+和 String。还有 1种复杂数据类型——Object，Object 本质上是由一组无序的名值对组成的。
+
+
+
