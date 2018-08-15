@@ -106,3 +106,19 @@ changeColor();
 无论全局环境还是 changeColor()的局部环境都无权访问 tempColor。然而，在 swapColors()内部
 则可以访问其他两个环境中的所有变量，因为那两个环境是它的父执行环境。图 4-3 形象地展示了前面
 这个例子的作用域链。
+
+没有块级作用域
+// 1
+if (true) {
+ var color = "blue";
+}
+alert(color); //"blue"
+这里是在一个 if 语句中定义了变量 color。如果是在 C、C++或 Java 中，color 会在 if 语句执
+行完毕后被销毁。但在 JavaScript 中，if 语句中的变量声明会将变量添加到当前的执行环境（在这里是
+全局环境）中。在使用 for 语句时尤其要牢记这一差异，例如：
+// 2
+for (var i=0; i < 10; i++){
+ doSomething(i);
+}
+alert(i); //10 
+
