@@ -67,3 +67,42 @@ var person = new Object();
 setName(person);
 alert(person.name); //"Nicholas" 
 
+检测类型
+var s = "Nicholas";
+var b = true;
+var i = 22;
+var u;
+var n = null;
+var o = new Object();
+alert(typeof s); //string
+alert(typeof i); //number
+alert(typeof b); //boolean
+alert(typeof u); //undefined
+alert(typeof n); //object
+alert(typeof o); //object 
+
+执行环境及作用域
+// 1
+var color = "blue";
+function changeColor(){
+ var anotherColor = "red";
+ function swapColors(){
+ var tempColor = anotherColor;
+ anotherColor = color;
+ color = tempColor;
+
+ // 这里可以访问 color、anotherColor 和 tempColor
+ }
+ // 这里可以访问 color 和 anotherColor，但不能访问 tempColor
+ swapColors();
+}
+// 这里只能访问 color
+changeColor(); 
+
+以上代码共涉及 3 个执行环境：全局环境、changeColor()的局部环境和 swapColors()的局部
+环境。全局环境中有一个变量 color 和一个函数 changeColor()。changeColor()的局部环境中有
+一个名为 anotherColor 的变量和一个名为 swapColors()的函数，但它也可以访问全局环境中的变
+量 color。swapColors()的局部环境中有一个变量 tempColor，该变量只能在这个环境中访问到。
+无论全局环境还是 changeColor()的局部环境都无权访问 tempColor。然而，在 swapColors()内部
+则可以访问其他两个环境中的所有变量，因为那两个环境是它的父执行环境。图 4-3 形象地展示了前面
+这个例子的作用域链。
