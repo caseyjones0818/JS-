@@ -122,3 +122,68 @@ for (var i=0; i < 10; i++){
 }
 alert(i); //10 
 
+# 第5章   引 用 类 型
+Object 类型
+1.创建 Object 实例的方式有两种。第一种是使用 new 操作符后跟 Object 构造函数，如下所示：
+var person = new Object();
+person.name = "Nicholas";
+person.age = 29; 
+2.另一种方式是使用对象字面量表示法。对象字面量是对象定义的一种简写形式，目的在于简化创建
+包含大量属性的对象的过程。下面这个例子就使用了对象字面量语法定义了与前面那个例子中相同的
+person 对象：
+var person = {
+ name : "Nicholas",
+ age : 29
+}; 
+在最后一个属性后面添加逗号，会在 IE7 及更早版本和
+Opera 中导致错误。
+
+3.在使用对象字面量语法时，属性名也可以使用字符串，如下面这个例子所示。
+var person = {
+ "name" : "Nicholas",
+ "age" : 29,
+ 5 : true
+};
+这个例子会创建一个对象，包含三个属性：name、age 和 5。但这里的数值属性名会自动转换为字
+符串。
+
+4.另外，使用对象字面量语法时，如果留空其花括号，则可以定义只包含默认属性和方法的对象，如
+下所示：
+var person = {}; //与 new Object()相同
+person.name = "Nicholas";
+person.age = 29; 
+
+# 推荐使用对象方法 虽然可以使用前面介绍的任何一种方法来定义对象，但开发人员更青睐对象字面量语法，因为这种
+# 语法要求的代码量少，而且能够给人封装数据的感觉。实际上，对象字面量也是向函数传递大量可选参数的首选方式，例如：
+function displayInfo(args) {
+ var output = "";
+ if (typeof args.name == "string"){
+   output += "Name: " + args.name + "\n";
+ }
+ if (typeof args.age == "number") {
+   output += "Age: " + args.age + "\n";
+ }
+ alert(output);
+}
+displayInfo({
+ name: "Nicholas",
+ age: 29
+});
+displayInfo({
+ name: "Greg"
+}); 
+这种传递参数的模式最适合需要向函数传入大量可选参数的情形。一般来讲，命
+名参数虽然容易处理，但在有多个可选参数的情况下就会显示不够灵活。最好的做法
+是对那些必需值使用命名参数，而使用对象字面量来封装多个可选参数。
+
+一般来说，访问对象属性时使用的都是点表示法，这也是很多面向对象语言中通用的语法。不过，
+在 JavaScript 也可以使用方括号表示法来访问对象的属性。在使用方括号语法时，应该将要访问的属性
+以字符串的形式放在方括号中，如下面的例子所示。
+alert(person["name"]); //"Nicholas"
+alert(person.name); //"Nicholas" 
+
+Array 类型
+
+
+
+
