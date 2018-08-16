@@ -183,7 +183,126 @@ alert(person["name"]); //"Nicholas"
 alert(person.name); //"Nicholas" 
 
 Array 类型
+创建数组的基本方式有两种。
 
+第一种是使用 Array 构造函数，如下面的代码所示。
+var colors = new Array(); 
+另外，在使用 Array 构造函数时也可以省略 new 操作符。如下面的例子所示，省略 new 操作符的
+结果相同：
+var colors = Array(3); // 创建一个包含 3 项的数组
+var names = Array("Greg"); // 创建一个包含 1 项，即字符串"Greg"的数组
+第二种基本方式是使用数组字面量表示法。数组字面量由一对包含数组项的方括号表
+示，多个数组项之间以逗号隔开，如下所示：
+var colors = ["red", "blue", "green"]; // 创建一个包含 3 个字符串的数组
+var names = []; // 创建一个空数组
+var values = [1,2,]; // 不要这样！这样会创建一个包含 2 或 3 项的数组
+var options = [,,,,,]; // 不要这样！这样会创建一个包含 5 或 6 项的数组
 
+数组最多可以包含 4 294 967 295 个项，这几乎已经能够满足任何编程需求了。如
+果想添加的项数超过这个上限值，就会发生异常。而创建一个初始大小与这个上限值
+接近的数组，则可能会导致运行时间超长的脚本错误。
 
+检测数组
+if (Array.isArray(value)){
+ //对数组执行某些操作
+} 
 
+转换方法
+// 1
+var colors = ["red", "blue", "green"]; // 创建一个包含 3 个字符串的数组
+alert(colors.toString()); // red,blue,green
+alert(colors.valueOf()); // red,blue,green
+alert(colors); // red,blue,green 
+// 2
+var colors = ["red", "green", "blue"];
+alert(colors.join(",")); //red,green,blue
+alert(colors.join("||")); //red||green||blue 
+如果数组中的某一项的值是 null 或者 undefined，那么该值在 join()、
+toLocaleString()、toString()和 valueOf()方法返回的结果中以空字符串表示。
+
+栈方法
+栈是一种 LIFO（Last-In-First-Out，后进先出）的数据结构，也就是最新添加的项最早被移除。而栈中项的插入（叫做推入）和移除（叫做
+弹出），只发生在一个位置——栈的顶部。ECMAScript 为数组专门提供了 push()和 pop()方法，以便
+实现类似栈的行为。
+
+push()方法可以接收任意数量的参数，把它们逐个添加到数组末尾，并返回修改后数组的长度。而
+pop()方法则从数组末尾移除最后一项，减少数组的 length 值，然后返回移除的项。请看下面的例子：
+var colors = new Array(); // 创建一个数组
+var count = colors.push("red", "green"); // 推入两项
+alert(count); //2
+count = colors.push("black"); // 推入另一项
+alert(count); //3
+var item = colors.pop(); // 取得最后一项
+alert(item); //"black"
+alert(colors.length); //2 
+
+队列方法
+1.而队列数据结构的访问规则是 FIFO（First-In-First-Out，先进先出）。
+结合使用 shift()和 push()方法，可以像使用队列一样使用数组。
+var colors = new Array(); //创建一个数组
+var count = colors.push("red", "green"); //推入两项
+alert(count); //2
+count = colors.push("black"); //推入另一项
+alert(count); //3
+var item = colors.shift(); //取得第一项
+alert(item); //"red"
+alert(colors.length); //2
+
+2.ECMAScript 还为数组提供了一个 unshift()方法。顾名思义，unshift()与 shift()的用途相反：
+它能在数组前端添加任意个项并返回新数组的长度。因此，同时使用 unshift()和 pop()方法，可以
+从相反的方向来模拟队列，即在数组的前端添加项，从数组末端移除项，如下面的例子所示。
+var colors = new Array(); //创建一个数组
+var count = colors.unshift("red", "green"); //推入两项
+alert(count); //2 
+count = colors.unshift("black"); //推入另一项
+alert(count); //3
+var item = colors.pop(); //取得最后一项
+alert(item); //"green"
+alert(colors.length); //2 
+后是"black"，数组中各项的顺序为"black"、"red"、"green"。在调用 pop()方法时，移除并返回
+的是最后一项，即"green"。
+
+重排序方法
+1.数组中已经存在两个可以直接用来重排序的方法：reverse()和 sort()。有读者可能猜到了，
+reverse()方法会反转数组项的顺序。请看下面这个例子。
+var values = [1, 2, 3, 4, 5];
+values.reverse();
+alert(values); //5,4,3,2,1 
+
+2.比较函数接收两个参数，如果第一个参数应该位于第二个之前则返回一个负数，如果两个参数相等
+则返回 0，如果第一个参数应该位于第二个之后则返回一个正数。以下就是一个简单的比较函数：
+function compare(value1, value2) {
+ if (value1 < value2) {
+ return -1;
+ } else if (value1 > value2) {
+ return 1;
+ } else {
+ return 0;
+ }
+}
+
+这个比较函数可以适用于大多数数据类型，只要将其作为参数传递给 sort()方法即可，如下面这
+个例子所示。
+var values = [0, 1, 5, 10, 15];
+values.sort(compare);
+alert(values); //0,1,5,10,15 
+在将比较函数传递到 sort()方法之后，数值仍然保持了正确的升序。当然，也可以通过比较函数
+产生降序排序的结果，只要交换比较函数返回的值即可。
+function compare(value1, value2) {
+ if (value1 < value2) {
+ return 1;
+ } else if (value1 > value2) {
+ return -1;
+ } else {
+ return 0;
+ }
+}
+var values = [0, 1, 5, 10, 15];
+values.sort(compare);
+alert(values); // 15,10,5,1,0 
+
+在这个修改后的例子中，比较函数在第一个值应该位于第二个之后的情况下返回 1，而在第一个值
+应该在第二个之前的情况下返回1。交换返回值的意思是让更大的值排位更靠前，也就是对数组按照降
+序排序。当然，如果只想反转数组原来的顺序，使用 reverse()方法要更快一些。
+
+ 操作方法
