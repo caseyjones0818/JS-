@@ -619,9 +619,121 @@ var sum = function(num1, num2){
 #也可以同时使用函数声明和函数表达式，例如 var sum = function sum(){}。不过，这种语法在 Safari 中会导致错误。
 
 *作为值的函数
+因为 ECMAScript 中的函数名本身就是变量，所以函数也可以作为值来使用。也就是说，不仅可以
+像传递参数一样把一个函数传递给另一个函数，而且可以将一个函数作为另一个函数的结果返回。来看
+一看下面的函数。
+function callSomeFunction(someFunction, someArgument){
+ return someFunction(someArgument);
+} 
+这个函数接受两个参数。第一个参数应该是一个函数，第二个参数应该是要传递给该函数的一个值。
+然后，就可以像下面的例子一样传递函数了。
+// 1
+function add10(num){
+ return num + 10;
+}
+var result1 = callSomeFunction(add10, 10);
+alert(result1); //20
+// 2
+function getGreeting(name){
+ return "Hello, " + name;
+}
+var result2 = callSomeFunction(getGreeting, "Nicholas");
+alert(result2); //"Hello, Nicholas" 
 
+这里的 callSomeFunction()函数是通用的，即无论第一个参数中传递进来的是什么函数，它都
+会返回执行第一个参数后的结果。还记得吧，要访问函数的指针而不执行函数的话，必须去掉函数名后
+面的那对圆括号。
+#因此上面例子中传递给 callSomeFunction()的是 add10 和 getGreeting，而不是执行它们之后的结果。
 
+函数内部属性
+在函数内部，有两个特殊的对象：arguments 和 this。
+#arguments 暂时不写
 
+this引用的是函数据以执行的环境对象——或者也可以说是 this 值（当在网页的全局作用域中调用函数时，
+this 对象引用的就是 window）。来看下面的例子。
+window.color = "red";
+var o = { color: "blue" };
+function sayColor(){
+ alert(this.color);
+}
+sayColor(); //"red"
+o.sayColor = sayColor;
+o.sayColor(); //"blue" 
 
+#caller暂时不写
 
+函数属性和方法
+每个函数都包含两个属性：length 和 prototype。
+其中，length 属性表示函数希望接收的命名参数的个数，如下面的例子所示。
+function sayName(name){
+ alert(name);
+}
+function sum(num1, num2){
+ return num1 + num2;
+}
+function sayHi(){
+ alert("hi");
+}
+alert(sayName.length); //1
+alert(sum.length); //2
+alert(sayHi.length); //0 
+
+#每个函数都包含两个非继承而来的方法：apply()和 call()。
+这两个方法的用途都是在特定的作用域中调用函数，实际上等于设置函数体内 this 对象的值。
+apply()方法，接收两个参数：一个是在其中运行函数的作用域，另一个是参数数组。其中，第二个参数可以是 Array 的实例，也可以是arguments 对象。
+例如：
+function sum(num1, num2){
+ return num1 + num2;
+}
+function callSum1(num1, num2){
+ return sum.apply(this, arguments); // 传入 arguments 对象
+}
+function callSum2(num1, num2){
+ return sum.apply(this, [num1, num2]); // 传入数组
+}
+alert(callSum1(10,10)); //20
+alert(callSum2(10,10)); //20 
+#在上面这个例子中，callSum1()在执行 sum()函数时传入了 this 作为 this 值（因为是在全局
+#作用域中调用的，所以传入的就是 window 对象）和 arguments 对象。而 callSum2 同样也调用了
+#sum()函数，但它传入的则是 this 和一个参数数组。这两个函数都会正常执行并返回正确的结果。
+
+call()方法与 apply()方法的作用相同，它们的区别仅在于接收参数的方式不同。
+# 在使用call()方法时，传递给函数的参数必须逐个列举出来
+function sum(num1, num2){
+ return num1 + num2;
+}
+function callSum(num1, num2){
+ return sum.call(this, num1, num2);
+}
+alert(callSum(10,10)); //20 
+
+#传递参数并非 apply()和 call()真正的用武之地；它们真正强大的地方是能够扩充函数赖以运行的作用域。
+call()，下面例子
+window.color = "red";
+var o = { color: "blue" };
+function sayColor(){
+ alert(this.color);
+}
+sayColor(); //red
+sayColor.call(this); //red
+sayColor.call(window); //red
+sayColor.call(o); //blue 
+在前面例子的第一个版本中，我们是先将 sayColor()函数放到了对象 o 中
+
+bind()，这个方法会创建一个函数的实例，其 this 值会被绑定到传给 bind()函数的值。
+例如：
+window.color = "red";
+var o = { color: "blue" };
+function sayColor(){
+ alert(this.color);
+}
+var objectSayColor = sayColor.bind(o);
+objectSayColor(); //blue 
+
+Boolean类型
+Number类型
+String类型
+暂定
+
+# 第6章 面向对象的程序设计
 
