@@ -736,4 +736,187 @@ String类型
 暂定
 
 # 第6章 面向对象的程序设计
+ECMAScript 中没有类的概念，因此它的对象也与基于类的语言中的对象有所不同。
+ECMA-262 把对象定义为：“无序属性的集合，其属性可以包含基本值、对象或者函数。”
+我们可以把 ECMAScript 的对象想象成散列表：无非就是一组名值对，其中值可以是数据或函数。
+每个对象都是基于一个引用类型创建的，这个引用类型可以是第 5 章讨论的原生类型，也可以是开发人员定义的类型。
+
+理解对象
+var person = {
+ name: "Nicholas",
+ age: 29,
+ job: "Software Engineer",
+ sayName: function(){
+ alert(this.name);
+ }
+}; 
+属性类型
+ECMAScript 中有两种属性：数据属性和访问器属性。
+1. 数据属性
+数据属性包含一个数据值的位置。在这个位置可以读取和写入值。数据属性有 4 个描述其行为的特性。
+ [[Configurable]]：表示能否通过 delete 删除属性从而重新定义属性，能否修改属性的特
+性，或者能否把属性修改为访问器属性。像前面例子中那样直接在对象上定义的属性，它们的
+这个特性默认值为 true。
+ [[Enumerable]]：表示能否通过 for-in 循环返回属性。像前面例子中那样直接在对象上定
+义的属性，它们的这个特性默认值为 true。
+ [[Writable]]：表示能否修改属性的值。像前面例子中那样直接在对象上定义的属性，它们的
+这个特性默认值为 true。
+ [[Value]]：包含这个属性的数据值。读取属性值的时候，从这个位置读；写入属性值的时候，
+把新值保存在这个位置。这个特性的默认值为 undefined。
+对于像前面例子中那样直接在对象上定义的属性，它们的[[Configurable]]、[[Enumerable]]
+和[[Writable]]特性都被设置为 true，而[[Value]]特性被设置为指定的值。例如：
+var person = {};
+Object.defineProperty(person, "name", {
+ writable: false,
+ value: "Nicholas"
+});
+alert(person.name); //"Nicholas"
+person.name = "Greg";
+alert(person.name); //"Nicholas" 
+这个例子创建了一个名为 name 的属性，它的值"Nicholas"是只读的。这个属性的值是不可修改
+的，如果尝试为它指定新值，则在非严格模式下，赋值操作将被忽略；在严格模式下，赋值操作将会导
+致抛出错误。
+类似的规则也适用于不可配置的属性。例如：
+var person = {};
+Object.defineProperty(person, "name", {
+ configurable: false,
+ value: "Nicholas"
+});
+alert(person.name); //"Nicholas"
+delete person.name;
+alert(person.name); //"Nicholas" 
+多数情况下，可能都没有必要利用 Object.defineProperty()方法提供的这些高级功能。不过，理解这些概念对理解 JavaScript 对象却非常有用。
+2. 访问器属性
+访问器属性不包含数据值；它们包含一对儿 getter 和 setter 函数（不过，这两个函数都不是必需的）。
+访问器属性不能直接定义，必须使用 Object.defineProperty()来定义。请看下面的例子。
+var book = {
+ _year: 2004,
+ edition: 1
+};
+Object.defineProperty(book, "year", {
+ get: function(){
+ return this._year;
+ },
+ set: function(newValue){
+ if (newValue > 2004) {
+ this._year = newValue;
+ this.edition += newValue - 2004;
+ }
+ }
+});
+book.year = 2005;
+alert(book.edition); //2 
+
+定义多个属性
+Object.defineProperties()方法。利用这个方法可以通过描述符一次定义多个属性。这个方法接收两个对象参数：第一
+个对象是要添加和修改其属性的对象，第二个对象的属性与第一个对象中要添加或修改的属性一一对
+应。例如：
+var book = {};
+Object.defineProperties(book, {
+ _year: {
+ value: 2004
+ },
+
+ edition: {
+ value: 1
+ },
+ year: {
+ get: function(){ 
+  return this._year;
+ },
+ set: function(newValue){
+ if (newValue > 2004) {
+ this._year = newValue;
+ this.edition += newValue - 2004;
+    }
+   }
+ }
+}); 
+以上代码在 book 对象上定义了两个数据属性（_year 和 edition）和一个访问器属性（year）。
+最终的对象与上一节中定义的对象相同。唯一的区别是这里的属性都是在同一时间创建的。
+
+读取属性的特性
+使用 ECMAScript 5 的 Object.getOwnPropertyDescriptor()方法，可以取得给定属性的描述
+符。这个方法接收两个参数：属性所在的对象和要读取其描述符的属性名称。返回值是一个对象，如果
+是访问器属性，这个对象的属性有 configurable、enumerable、get 和 set；如果是数据属性，这
+个对象的属性有 configurable、enumerable、writable 和 value。例如：
+var book = {};
+Object.defineProperties(book, {
+ _year: {
+ value: 2004
+ },
+ edition: {
+ value: 1
+ },
+ year: {
+ get: function(){
+ return this._year;
+ },
+ set: function(newValue){
+ if (newValue > 2004) {
+ this._year = newValue;
+ this.edition += newValue - 2004;
+ }
+ }
+ }
+});
+var descriptor = Object.getOwnPropertyDescriptor(book, "_year");
+alert(descriptor.value); //2004
+alert(descriptor.configurable); //false 
+alert(typeof descriptor.get); //"undefined"
+var descriptor = Object.getOwnPropertyDescriptor(book, "year");
+alert(descriptor.value); //undefined
+alert(descriptor.enumerable); //false
+alert(typeof descriptor.get); //"function" 
+
+**创建对象
+虽然 Object 构造函数或对象字面量都可以用来创建单个对象，但这些方式有个明显的缺点：使用同
+一个接口创建很多对象，会产生大量的重复代码。为解决这个问题，人们开始使用工厂模式的一种变体。
+
+工厂模式是软件工程领域一种广为人知的设计模式，这种模式抽象了创建具体对象的过程（本书后
+面还将讨论其他设计模式及其在 JavaScript 中的实现）。考虑到在 ECMAScript 中无法创建类，开发人员
+就发明了一种函数，用函数来封装以特定接口创建对象的细节，如下面的例子所示。
+function createPerson(name, age, job){
+   var o = new Object();
+   o.name = name;
+   o.age = age;
+   o.job = job;
+   o.sayName = function(){
+   alert(this.name);
+   };
+   return o;
+}
+var person1 = createPerson("Nicholas", 29, "Software Engineer");
+var person2 = createPerson("Greg", 27, "Doctor");
+#工厂模式虽然解决了创建多个相似对象的问题，但却没有解决对象识别的问题（即怎样知道一个对象的类型）。随着 JavaScript的发展，又一个新模式出现了。
+*构造函数模式
+ECMAScript 中的构造函数可用来创建特定类型的对象。像 Object 和 Array 这样的原生构造函数，在运行时会自动出现在执行环境中。此外，也可以创建自定义的构造函数，
+从而定义自定义对象类型的属性和方法。例如，可以使用构造函数模式将前面的例子重写如下。
+function Person(name, age, job){
+  this.name = name;
+  this.age = age;
+  this.job = job;
+  this.sayName = function(){
+  alert(this.name);
+  };
+}
+var person1 = new Person("Nicholas", 29, "Software Engineer");
+var person2 = new Person("Greg", 27, "Doctor"); 
+我们注意到，Person()中的代码除了与 createPerson()中相同的部分外，还存在以下不同之处：
+ 没有显式地创建对象；
+ 直接将属性和方法赋给了 this 对象；
+ 没有 return 语句。
+此外，还应该注意到函数名 Person 使用的是大写字母 P。按照惯例，构造函数始终都应该以一个
+大写字母开头，而非构造函数则应该以一个小写字母开头。这个做法借鉴自其他 OO 语言，主要是为了
+区别于 ECMAScript 中的其他函数；因为构造函数本身也是函数，只不过可以用来创建对象而已。
+要创建 Person 的新实例，必须使用 new 操作符。以这种方式调用构造函数实际上会经历以下
+4个步骤：
+(1) 创建一个新对象；
+(2) 将构造函数的作用域赋给新对象（因此 this 就指向了这个新对象）；
+(3) 执行构造函数中的代码（为这个新对象添加属性）；
+(4) 返回新对象
+在前面例子的最后，person1 和 person2 分别保存着 Person 的一个不同的实例。这两个对象都有一个 constructor（构造函数）属性，
+该属性指向 Person，如下所示。
+alert(person1.constructor == Person); //true
+alert(person2.constructor == Person); //true 
 
