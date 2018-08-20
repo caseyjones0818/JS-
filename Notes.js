@@ -172,13 +172,11 @@ displayInfo({
 displayInfo({
  name: "Greg"
 }); 
-这种传递参数的模式最适合需要向函数传入大量可选参数的情形。一般来讲，命
-名参数虽然容易处理，但在有多个可选参数的情况下就会显示不够灵活。最好的做法
-是对那些必需值使用命名参数，而使用对象字面量来封装多个可选参数。
+这种传递参数的模式最适合需要向函数传入大量可选参数的情形。一般来讲，命名参数虽然容易处理，但在有多个可选参数的情况下就会显示不够灵活。
+最好的做法是对那些必需值使用命名参数，而使用对象字面量来封装多个可选参数。
 
-一般来说，访问对象属性时使用的都是点表示法，这也是很多面向对象语言中通用的语法。不过，
-在 JavaScript 也可以使用方括号表示法来访问对象的属性。在使用方括号语法时，应该将要访问的属性
-以字符串的形式放在方括号中，如下面的例子所示。
+一般来说，访问对象属性时使用的都是点表示法，这也是很多面向对象语言中通用的语法。不过，在 JavaScript 也可以使用方括号表示法来访问对象的属性。
+在使用方括号语法时，应该将要访问的属性以字符串的形式放在方括号中，如下面的例子所示。
 alert(person["name"]); //"Nicholas"
 alert(person.name); //"Nicholas" 
 
@@ -269,8 +267,8 @@ var values = [1, 2, 3, 4, 5];
 values.reverse();
 alert(values); //5,4,3,2,1 
 
-2.比较函数接收两个参数，如果第一个参数应该位于第二个之前则返回一个负数，如果两个参数相等
-则返回 0，如果第一个参数应该位于第二个之后则返回一个正数。以下就是一个简单的比较函数：
+2.比较函数接收两个参数，如果第一个参数应该位于第二个之前则返回一个负数，如果两个参数相等则返回 0，
+如果第一个参数应该位于第二个之后则返回一个正数。以下就是一个简单的比较函数：
 function compare(value1, value2) {
  if (value1 < value2) {
  return -1;
@@ -281,13 +279,11 @@ function compare(value1, value2) {
  }
 }
 
-这个比较函数可以适用于大多数数据类型，只要将其作为参数传递给 sort()方法即可，如下面这
-个例子所示。
+这个比较函数可以适用于大多数数据类型，只要将其作为参数传递给 sort()方法即可，如下面这个例子所示。
 var values = [0, 1, 5, 10, 15];
 values.sort(compare);
 alert(values); //0,1,5,10,15 
-在将比较函数传递到 sort()方法之后，数值仍然保持了正确的升序。当然，也可以通过比较函数
-产生降序排序的结果，只要交换比较函数返回的值即可。
+在将比较函数传递到 sort()方法之后，数值仍然保持了正确的升序。当然，也可以通过比较函数产生降序排序的结果，只要交换比较函数返回的值即可。
 function compare(value1, value2) {
  if (value1 < value2) {
  return 1;
@@ -431,20 +427,17 @@ numbers.forEach(function(item, index, array){
 });
 
 归并方法
-reduce()和 reduceRight(), reduce(), 方法从数组的第一项开始，逐个遍历
-到最后。而 reduceRight()则从数组的最后一项开始，向前遍历到第一项。
+reduce()和 reduceRight(), reduce(), 方法从数组的第一项开始，逐个遍历到最后。而 reduceRight()则从数组的最后一项开始，向前遍历到第一项。
 这两个方法都接收两个参数：一个在每一项上调用的函数和（可选的）作为归并基础的初始值。传给 reduce()和 reduceRight()的函数接收 4 个参数：前一个值、当前值、项的索引和数组对象。这
-个函数返回的任何值都会作为第一个参数自动传给下一项。第一次迭代发生在数组的第二项上，因此第
-一个参数是数组的第一项，第二个参数就是数组的第二项。
+个函数返回的任何值都会作为第一个参数自动传给下一项。第一次迭代发生在数组的第二项上，因此第一个参数是数组的第一项，第二个参数就是数组的第二项。
 使用 reduce()方法可以执行求数组中所有值之和的操作，比如：
 var values = [1,2,3,4,5];
 var sum = values.reduce(function(prev, cur, index, array){
  return prev + cur;
 });
 alert(sum); //15 
-第一次执行回调函数，prev 是 1，cur 是 2。第二次，prev 是 3（1 加 2 的结果），cur 是 3（数组
-的第三项）。这个过程会持续到把数组中的每一项都访问一遍，最后返回结果。
-reduceRight()的作用类似，只不过方向相反而已。来看下面这个例子。
+第一次执行回调函数，prev 是 1，cur 是 2。第二次，prev 是 3（1 加 2 的结果），cur 是 3（数组的第三项）。
+这个过程会持续到把数组中的每一项都访问一遍，最后返回结果。reduceRight()的作用类似，只不过方向相反而已。来看下面这个例子。
 var values = [1,2,3,4,5];
 var sum = values.reduceRight(function(prev, cur, index, array){
  return prev + cur;
@@ -575,16 +568,14 @@ alert(anotherSum(10,10)); //20
 anotherSum()。
 
 # 没有重载（深入理解）
-将函数名想象为指针，也有助于理解为什么 ECMAScript 中没有函数重载的概念。以下是曾在第 3
-章使用过的例子。
+将函数名想象为指针，也有助于理解为什么 ECMAScript 中没有函数重载的概念。以下是曾在第 3章使用过的例子。
 function addSomeNumber(num){
  return num + 100;
 }
 function addSomeNumber(num) {
  return num + 200;
 }
-显然，这个例子中声明了两个同名函数，而结果则是后面的函数覆盖了前面的函数。以上代码实际
-上与下面的代码没有什么区别。
+显然，这个例子中声明了两个同名函数，而结果则是后面的函数覆盖了前面的函数。以上代码实际上与下面的代码没有什么区别。
 var addSomeNumber = function (num){
  return num + 100;
 };
@@ -619,14 +610,12 @@ var sum = function(num1, num2){
 #也可以同时使用函数声明和函数表达式，例如 var sum = function sum(){}。不过，这种语法在 Safari 中会导致错误。
 
 *作为值的函数
-因为 ECMAScript 中的函数名本身就是变量，所以函数也可以作为值来使用。也就是说，不仅可以
-像传递参数一样把一个函数传递给另一个函数，而且可以将一个函数作为另一个函数的结果返回。来看
-一看下面的函数。
+因为 ECMAScript 中的函数名本身就是变量，所以函数也可以作为值来使用。也就是说，不仅可以像传递参数一样把一个函数传递给另一个函数，
+而且可以将一个函数作为另一个函数的结果返回。来看一看下面的函数。
 function callSomeFunction(someFunction, someArgument){
  return someFunction(someArgument);
 } 
-这个函数接受两个参数。第一个参数应该是一个函数，第二个参数应该是要传递给该函数的一个值。
-然后，就可以像下面的例子一样传递函数了。
+这个函数接受两个参数。第一个参数应该是一个函数，第二个参数应该是要传递给该函数的一个值。然后，就可以像下面的例子一样传递函数了。
 // 1
 function add10(num){
  return num + 10;
@@ -915,8 +904,38 @@ var person2 = new Person("Greg", 27, "Doctor");
 (2) 将构造函数的作用域赋给新对象（因此 this 就指向了这个新对象）；
 (3) 执行构造函数中的代码（为这个新对象添加属性）；
 (4) 返回新对象
-在前面例子的最后，person1 和 person2 分别保存着 Person 的一个不同的实例。这两个对象都有一个 constructor（构造函数）属性，
-该属性指向 Person，如下所示。
+在前面例子的最后，person1 和 person2 分别保存着 Person 的一个不同的实例。
+#这两个对象都有一个 constructor（构造函数）属性，该属性指向 Person，如下所示。
 alert(person1.constructor == Person); //true
 alert(person2.constructor == Person); //true 
+对象的 constructor 属性最初是用来标识对象类型的。但是，提到检测对象类型，还是 instanceof操作符要更可靠一些。
+我们在这个例子中创建的所有对象既是 Object 的实例，同时也是 Person的实例，这一点通过 instanceof 操作符可以得到验证。
+alert(person1 instanceof Object); //true
+alert(person1 instanceof Person); //true
+alert(person2 instanceof Object); //true
+alert(person2 instanceof Person); //true 
+#创建自定义的构造函数意味着将来可以将它的实例标识为一种特定的类型；而这正是构造函数模式胜过工厂模式的地方。
+在这个例子中，person1 和 person2 之所以同时是 Object 的实例，是因为所有对象均继承自 Object（详细内容稍后讨论）。
+
+将构造函数当作函数
+任何函数，只要通过 new 操作符来调用，那它就可以作为构造函数；而任何函数，如果不通过 new 操作符来调用，
+那它跟普通函数也不会有什么两样。例如，前面例子中定义的 Person()函数可以通过下列任何一种方式来调用。
+// 当作构造函数使用
+var person = new Person("Nicholas", 29, "Software Engineer");
+person.sayName(); //"Nicholas"
+// 作为普通函数调用
+Person("Greg", 27, "Doctor"); // 添加到 window
+window.sayName(); //"Greg"
+// 在另一个对象的作用域中调用
+var o = new Object();
+Person.call(o, "Kristen", 25, "Nurse");
+o.sayName(); //"Kristen" 
+
+构造函数的问题
+使用构造函数的主要问题，就是每个方法都要在每个实例上重新创建一遍。在前面的例子中，person1 和 person2 都有一个名为 sayName()的方法，但那
+两个方法不是同一个 Function 的实例。
+
+*原型模式* #（重点攻克区）
+
+ 
 
