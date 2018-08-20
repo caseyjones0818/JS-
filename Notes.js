@@ -936,6 +936,130 @@ o.sayName(); //"Kristen"
 两个方法不是同一个 Function 的实例。
 
 *原型模式* #（重点攻克区）
+prototype 就是通过调用构造函数而创建的那个对象实例的原型对象。使用原型对象的好处是可以让所有对象实例共享它所包含的属性和方法。
+换句话说，不必在构造函数中定义对象实例的信息，而是可以将这些信息直接添加到原型对象中，如下面的例子所示。
+function Person(){
+}
+Person.prototype.name = "Nicholas";
+Person.prototype.age = 29;
+Person.prototype.job = "Software Engineer";
+Person.prototype.sayName = function(){
+ alert(this.name);
+};
+var person1 = new Person();
+person1.sayName(); //"Nicholas"
+var person2 = new Person(); 
+person2.sayName(); //"Nicholas"
+alert(person1.sayName == person2.sayName); //true 
+要理解原型模式的工作原理，必须先理解 ECMAScript 中原型对象的性质。
 
- 
+理解原型对象
+无论什么时候，只要创建了一个新函数，就会根据一组特定的规则为该函数创建一个 prototype
+属性，这个属性指向函数的原型对象。在默认情况下，所有原型对象都会自动获得一个 constructor
+（构造函数）属性，这个属性包含一个指向 prototype 属性所在函数的指针。
+# isPrototypeOf()
+虽然在所有实现中都无法访问到[[Prototype]]，但可以通过 isPrototypeOf()方法来确定对象之
+间是否存在这种关系。从本质上讲，如果[[Prototype]]指向调用 isPrototypeOf()方法的对象
+（Person.prototype），那么这个方法就返回 true，如下所示：
+alert(Person.prototype.isPrototypeOf(person1)); //true
+alert(Person.prototype.isPrototypeOf(person2)); //true 
+#这里，我们用原型对象的 isPrototypeOf()方法测试了 person1 和 person2。因为它们内部都有一个指向 Person.prototype 的指针，因此都返回了 true。
+#getPrototypeOf()
+ECMAScript 5 增加了一个新方法，叫 Object.getPrototypeOf()，在所有支持的实现中，这个
+方法返回[[Prototype]]的值。例如：
+alert(Object.getPrototypeOf(person1) == Person.prototype); //true
+alert(Object.getPrototypeOf(person1).name); //"Nicholas" 
+
+实例中添加与实例原型中的一个属性同名，该属性将会屏蔽原型中的那个属性。来看下面的例子。 
+function Person(){
+}
+Person.prototype.name = "Nicholas";
+Person.prototype.age = 29;
+Person.prototype.job = "Software Engineer";
+Person.prototype.sayName = function(){
+ alert(this.name);
+};
+var person1 = new Person(); 
+var person2 = new Person();
+person1.name = "Greg";
+alert(person1.name); //"Greg"——来自实例
+alert(person2.name); //"Nicholas"——来自原型
+使用 delete 操作符则可以完全删除实例属性，从而让我们能够重新访问原型中的属性，如下所示。
+function Person(){
+}
+Person.prototype.name = "Nicholas";
+Person.prototype.age = 29;
+Person.prototype.job = "Software Engineer";
+Person.prototype.sayName = function(){
+ alert(this.name);
+};
+var person1 = new Person();
+var person2 = new Person();
+person1.name = "Greg";
+alert(person1.name); //"Greg"——来自实例
+alert(person2.name); //"Nicholas"——来自原型
+delete person1.name;
+alert(person1.name); //"Nicholas"——来自原型
+
+使用 hasOwnProperty()方法可以检测一个属性是存在于实例中，还是存在于原型中。这个方法（不要忘了它是从 Object 继承来的）
+function Person(){
+}
+Person.prototype.name = "Nicholas";
+Person.prototype.age = 29;
+Person.prototype.job = "Software Engineer";
+Person.prototype.sayName = function(){ 
+  alert(this.name);
+};
+var person1 = new Person();
+var person2 = new Person();
+alert(person1.hasOwnProperty("name")); //false
+person1.name = "Greg";
+alert(person1.name); //"Greg"——来自实例
+alert(person1.hasOwnProperty("name")); //true
+alert(person2.name); //"Nicholas"——来自原型
+alert(person2.hasOwnProperty("name")); //false
+delete person1.name;
+alert(person1.name); //"Nicholas"——来自原型
+alert(person1.hasOwnProperty("name")); //false 
+
+要取得对象上所有可枚举的实例属性，可以使用 ECMAScript 5 的 Object.keys()方法。这个方法
+接收一个对象作为参数，返回一个包含所有可枚举属性的字符串数组。例如：
+function Person(){
+}
+Person.prototype.name = "Nicholas";
+Person.prototype.age = 29;
+Person.prototype.job = "Software Engineer";
+Person.prototype.sayName = function(){
+ alert(this.name);
+};
+var keys = Object.keys(Person.prototype);
+alert(keys); //"name,age,job,sayName"
+var p1 = new Person();
+p1.name = "Rob";
+p1.age = 31;
+var p1keys = Object.keys(p1);
+alert(p1keys); //"name,age" 
+如果你想要得到所有实例属性，无论它是否可枚举，都可以使用 Object.getOwnPropertyNames()方法。
+var keys = Object.getOwnPropertyNames(Person.prototype);
+alert(keys); //"constructor,name,age,job,sayName" 
+#注意结果中包含了不可枚举的 constructor 属性。Object.keys()和 Object.getOwnPropertyNames()方法都可以用来替代for-in 循环。
+
+***更简单的原型语法
+#前面例子中每添加一个属性和方法就要敲一遍 Person.prototype。为减少不必要的输入，也为了从视觉上更好地封装原型的功能，更常见的做法是用一个包含所有属性和方法的
+#对象字面量来重写整个原型对象，如下面的例子所示。
+function Person(){
+}
+Person.prototype = {
+   name : "Nicholas",
+   age : 29,
+   job: "Software Engineer",
+   sayName : function () {
+   alert(this.name);
+   }
+}; 
+
+
+
+
+
 
