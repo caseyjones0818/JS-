@@ -1057,7 +1057,203 @@ Person.prototype = {
    alert(this.name);
    }
 }; 
+在上面的代码中，我们将 Person.prototype 设置为等于一个以对象字面量形式创建的新对象。
+最终结果相同，但有一个例外：constructor 属性不再指向 Person 了。
+var friend = new Person();
+alert(friend instanceof Object); //true
+alert(friend instanceof Person); //true
+alert(friend.constructor == Person); //false
+alert(friend.constructor == Object); //true 
+在此，用 instanceof 操作符测试 Object 和 Person 仍然返回 true，但 constructor 属性则
+等于 Object 而不等于 Person 了。如果 constructor 的值真的很重要，可以像下面这样特意将它设
+置回适当的值。
+function Person(){
+}
+Person.prototype = {
+   constructor : Person,
+   name : "Nicholas",
+   age : 29,
+   job: "Software Engineer",
+   sayName : function () {
+   alert(this.name);
+   }
+};
+注意，以这种方式重设 constructor 属性会导致它的[[Enumerable]]特性被设置为 true。默认情况下，
+原生的 constructor 属性是不可枚举的，因此如果你使用兼容 ECMAScript 5 的 JavaScript 引擎，
+可以试一试 #Object.defineProperty()。
+//重设构造函数，只适用于 ECMAScript 5 兼容的浏览器
+Object.defineProperty(Person.prototype, "constructor", {
+ enumerable: false,
+ value: Person
+}); 
 
+原型的动态性
+由于在原型中查找值的过程是一次搜索，因此我们对原型对象所做的任何修改都能够立即从实例上
+反映出来——即使是先创建了实例后修改原型也照样如此。请看下面的例子。
+// 1
+var friend = new Person();
+Person.prototype.sayHi = function(){
+ alert("hi");
+};
+friend.sayHi(); //"hi"（没有问题！）
+尽管可以随时为原型添加属性和方法，并且修改能够立即在所有对象实例中反映出来，但如果是重
+写整个原型对象，那么情况就不一样了。我们知道，调用构造函数时会为实例添加一个指向最初原型的
+[[Prototype]]指针，而把原型修改为另外一个对象就等于切断了构造函数与最初原型之间的联系。
+请记住：实例中的指针仅指向原型，而不指向构造函数。看下面的例子。
+// 2
+function Person(){
+}
+var friend = new Person();
+
+Person.prototype = {
+ constructor: Person,
+ name : "Nicholas",
+ age : 29,
+ job : "Software Engineer",
+ sayName : function () {
+ alert(this.name);
+ }
+};
+friend.sayName(); //error 
+
+原生对象的原型
+所有原生引用类型（Object、Array、String，等等）都在其构造函数的原型上定义了方法。
+例如，在 Array.prototype 中可以找到 sort()方法，而在 String.prototype 中可以找到
+substring()方法，如下所示。
+alert(typeof Array.prototype.sort); //"function"
+alert(typeof String.prototype.substring); //"function" 
+通过原生对象的原型，不仅可以取得所有默认方法的引用，而且也可以定义新方法。可以像修改自
+定义对象的原型一样修改原生对象的原型，因此可以随时添加方法。下面的代码就给基本包装类型
+String 添加了一个名为 startsWith()的方法。
+
+
+#通过原生对象的原型，不仅可以取得所有默认方法的引用，而且也可以定义新方法。可以像修改自
+#定义对象的原型一样修改原生对象的原型，因此可以随时添加方法。下面的代码就给基本包装类型String 添加了一个名为 startsWith()的方法。
+String.prototype.startsWith = function (text) {
+ return this.indexOf(text) == 0;
+};
+var msg = "Hello world!";
+alert(msg.startsWith("Hello")); //true 
+
+原型对象的问题
+原型模式也不是没有缺点。首先，它省略了为构造函数传递初始化参数这一环节，结果所有实例在
+默认情况下都将取得相同的属性值。虽然这会在某种程度上带来一些不方便，但还不是原型的最大问题。
+原型模式的最大问题是由其共享的本性所导致的。
+原型中所有属性是被很多实例共享的，这种共享对于函数非常合适。
+function Person(){
+}
+Person.prototype = {
+ constructor: Person,
+ name : "Nicholas",
+ age : 29,
+ job : "Software Engineer",
+ friends : ["Shelby", "Court"],
+ sayName : function () {
+ alert(this.name);
+ }
+};
+var person1 = new Person();
+var person2 = new Person();
+person1.friends.push("Van");
+alert(person1.friends); //"Shelby,Court,Van"
+alert(person2.friends); //"Shelby,Court,Van"
+alert(person1.friends === person2.friends); //true 
+
+***组合使用构造函数模式和原型模式
+创建自定义类型的最常见方式，就是组合使用构造函数模式与原型模式。
+构造函数模式用于定义实例属性，而原型模式用于定义方法和共享的属性。结果，每个实例都会有自己的一份实例属性的副本，
+但同时又共享着对方法的引用，最大限度地节省了内存。另外，这种混成模式还支持向构造函数传递参数；可谓是集两种模式之长。
+下面的代码重写了前面的例子。
+function Person(name, age, job){ // 构造函数模式
+ this.name = name;
+ this.age = age;
+ this.job = job;
+ this.friends = ["Shelby", "Court"];
+}
+Person.prototype = {     //原型模式
+ constructor : Person,
+ sayName : function(){
+ alert(this.name);
+ }
+}
+var person1 = new Person("Nicholas", 29, "Software Engineer");
+var person2 = new Person("Greg", 27, "Doctor");
+person1.friends.push("Van");
+alert(person1.friends); //"Shelby,Count,Van"
+alert(person2.friends); //"Shelby,Count"
+alert(person1.friends === person2.friends); //false
+alert(person1.sayName === person2.sayName); //true 
+在这个例子中，实例属性都是在构造函数中定义的，而由所有实例共享的属性 constructor 和方
+法 sayName()则是在原型中定义的。而修改了 person1.friends（向其中添加一个新字符串），并不
+会影响到 person2.friends，因为它们分别引用了不同的数组。
+#这种构造函数与原型混成的模式，是目前在 ECMAScript 中使用最广泛、认同度最高的一种创建自定义类型的方法。可以说，这是用来定义引用类型的一种默认模式。
+
+动态原型模式
+可以通过检查某个应该存在的方法是否有效，来决定是否需要初始化原型。
+function Person(name, age, job){
+ //属性
+ this.name = name;
+ this.age = age;
+ this.job = job; 
+ //方法
+ if (typeof this.sayName != "function"){
+
+ Person.prototype.sayName = function(){
+ alert(this.name);
+ };
+
+ }
+}
+var friend = new Person("Nicholas", 29, "Software Engineer");
+friend.sayName(); 
+
+寄生构造函数模式
+function Person(name, age, job){
+ var o = new Object();
+ o.name = name;
+ o.age = age;
+ o.job = job;
+ o.sayName = function(){
+ alert(this.name);
+ };
+ return o;
+}
+var friend = new Person("Nicholas", 29, "Software Engineer");
+friend.sayName(); //"Nicholas" 
+
+稳妥构造函数模式
+function Person(name, age, job){
+
+ //创建要返回的对象
+ var o = new Object(); 
+ //可以在这里定义私有变量和函数
+ //添加方法
+ o.sayName = function(){
+ alert(name);
+ };
+ 
+ 继承
+ ECMAScript 只支持实现继承，而且其实现继承主要是依靠原型链来实现的。
+ 原型链
+ ECMAScript 中描述了#原型链的概念，并将原型链作为实现继承的主要方法。
+ #其基本思想是利用原型让一个引用类型继承另一个引用类型的属性和方法。
+ 简单回顾一下构造函数、原型和实例的关系：每个构造函数都有一个原型对象，原型对象都包含一个指向构造函数的指针，而实例都包含一个指向原型
+ 对象的内部指针。
+  假如另一个原型又是另一个类型的实例，那么上述关系依然成立，如此层层递进，就构成了实
+ 例与原型的链条。这就是所谓原型链的基本概念。
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ //返回对象
+ return o;
+} 
+var friend = Person("Nicholas", 29, "Software Engineer");
+friend.sayName(); //"Nicholas" 
 
 
 
