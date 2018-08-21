@@ -1231,7 +1231,12 @@ function Person(name, age, job){
  o.sayName = function(){
  alert(name);
  };
- 
+  //返回对象
+ return o;
+ } 
+ var friend = Person("Nicholas", 29, "Software Engineer");
+ friend.sayName(); //"Nicholas" 
+
  继承
  ECMAScript 只支持实现继承，而且其实现继承主要是依靠原型链来实现的。
  原型链
@@ -1249,11 +1254,7 @@ function Person(name, age, job){
  
  
 
- //返回对象
- return o;
-} 
-var friend = Person("Nicholas", 29, "Software Engineer");
-friend.sayName(); //"Nicholas" 
+
 
 
 
