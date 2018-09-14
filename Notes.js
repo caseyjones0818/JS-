@@ -1267,9 +1267,59 @@ alert(instance.getSuperValue()); //true
 以上代码定义了两个类型：SuperType 和 SubType。每个类型分别有一个属性和一个方法。它们
 的主要区别是 SubType 继承了 SuperType，而继承是通过创建 SuperType 的实例，并将该实例赋给
 SubType.prototype 实现的。
+
+# 第7章 函数表达式 
+定义函数的
+方式有两种：一种是函数声明，另一种就是函数表达式。函数声明的语法是这样的。
+function functionName(arg0, arg1, arg2) {
+ //函数体
+} 
+首先是 function 关键字，然后是函数的名字，这就是指定函数名的方式。
+
+关于函数声明，它的一个重要特征就是函数声明提升（function declaration hoisting），意思是在执行
+代码之前会先读取函数声明。这就意味着可以把函数声明放在调用它的语句后面。
+sayHi()
+function sayHi(){
+ alert("Hi!");
+} 
+
+第二种创建函数的方式是使用函数表达式。函数表达式有几种不同的语法形式。下面是最常见的一
+种形式。
+var functionName = function(arg0, arg1, arg2){
+ //函数体
+}; 
+这种形式看起来好像是常规的变量赋值语句，即创建一个函数并将它赋值给变量 functionName。
+这种情况下创建的函数叫做匿名函数（anonymous function），因为 function关键字后面没有标识符。
+（匿名函数有时候也叫拉姆达函数。）匿名函数的 name 属性是空字符串。
  
- 
- 
+理解函数提升的关键，就是理解函数声明与函数表达式之间的区别。例如，执行以下代码的结果可
+能会让人意想不到。
+//不要这样做！
+if(condition){
+ function sayHi(){
+ alert("Hi!");
+ }
+} else {
+ function sayHi(){
+ alert("Yo!");
+ }
+} 
+表面上看，以上代码表示在 condition 为 true 时，使用一个 sayHi()的定义；否则，就使用另
+一个定义。实际上，这在 ECMAScript 中属于无效语法，JavaScript 引擎会尝试修正错误，将其转换为合
+理的状态。但问题是浏览器尝试修正错误的做法并不一致。大多数浏览器会返回第二个声明，忽略
+condition；Firefox 会在 condition 为 true 时返回第一个声明。因此这种使用方式很危险，不应该
+出现在你的代码中。不过，如果是使用函数表达式，那就没有什么问题了。
+//可以这样做
+var sayHi;
+if(condition){
+ sayHi = function(){
+ alert("Hi!");
+ };
+} else {
+ sayHi = function(){
+ alert("Yo!");
+ };
+} 
 
 
 
