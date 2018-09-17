@@ -1269,8 +1269,7 @@ alert(instance.getSuperValue()); //true
 SubType.prototype 实现的。
 
 # 第7章 函数表达式 
-定义函数的
-方式有两种：一种是函数声明，另一种就是函数表达式。函数声明的语法是这样的。
+**定义函数的方式有两种：一种是函数声明，另一种就是函数表达式。函数声明的语法是这样的。
 function functionName(arg0, arg1, arg2) {
  //函数体
 } 
@@ -1280,7 +1279,7 @@ function functionName(arg0, arg1, arg2) {
 代码之前会先读取函数声明。这就意味着可以把函数声明放在调用它的语句后面。
 sayHi()
 function sayHi(){
- alert("Hi!");
+  alert("Hi!");
 } 
 
 第二种创建函数的方式是使用函数表达式。函数表达式有几种不同的语法形式。下面是最常见的一
@@ -1296,12 +1295,12 @@ var functionName = function(arg0, arg1, arg2){
 能会让人意想不到。
 //不要这样做！
 if(condition){
- function sayHi(){
- alert("Hi!");
+  function sayHi(){
+  alert("Hi!");
  }
 } else {
- function sayHi(){
- alert("Yo!");
+  function sayHi(){
+  alert("Yo!");
  }
 } 
 表面上看，以上代码表示在 condition 为 true 时，使用一个 sayHi()的定义；否则，就使用另
@@ -1312,15 +1311,89 @@ condition；Firefox 会在 condition 为 true 时返回第一个声明。因此�
 //可以这样做
 var sayHi;
 if(condition){
- sayHi = function(){
- alert("Hi!");
+  sayHi = function(){
+  alert("Hi!");
  };
 } else {
- sayHi = function(){
- alert("Yo!");
+  sayHi = function(){
+  alert("Yo!");
  };
 } 
 
+**递归
+递归函数是在一个函数通过名字调用自身的情况下构成的，如下所示。
+function factorial(num){
+ if (num <= 1){
+   return 1;
+ } else {
+   return num * factorial(num-1);
+ }
+}
+下面的代码却可能导致它出错。
+var anotherFactorial = factorial;
+factorial = null;
+alert(anotherFactorial(4)); //出错！
+
+我们知道，arguments.callee 是一个指向正在执行的函数的指针，因此可以用它来实现对函数
+的递归调用，例如：
+function factorial(num){
+ if (num <= 1){
+ return 1;
+ } else {
+ return num * arguments.callee(num-1);
+ }
+} 
+但在严格模式下，不能通过脚本访问 arguments.callee，访问这个属性会导致错误。不过，可
+以使用命名函数表达式来达成相同的结果。例如：
+var factorial = (function f(num){
+ if (num <= 1){
+ return 1;
+ } else {
+ return num * f(num-1);
+ }
+}); 
+以上代码创建了一个名为 f()的命名函数表达式，然后将它赋值给变量 factorial。即便把函数
+赋值给了另一个变量，函数的名字 f 仍然有效，所以递归调用照样能正确完成。这种方式在严格模式和
+非严格模式下都行得通。
+
+**闭包
+闭包是指有权访问另一个函数作用域中的变量的函数。创建闭包的常见方式，就是在一个函数内部创建另一个函数
+function createComparisonFunction(propertyName) {
+
+ return function(object1, object2){
+ var value1 = object1[propertyName]; // 注意
+ var value2 = object2[propertyName]; // 注意
+
+ if (value1 < value2){
+ return -1;
+ } else if (value1 > value2){
+ return 1;
+ } else {
+ return 0;
+ }
+ };
+} 
+由于闭包会携带包含它的函数的作用域，因此会比其他函数占用更多的内存。过度使用闭包可能会导致内存占用过多，
+我们建议读者只在绝对必要时再考虑使用闭包。虽然像 V8 等优化后的 JavaScript 引擎会尝试回收被闭包占用的内存，但请大家
+还是要慎重使用闭包。
+
+**内存泄漏
+如果闭包的作用域链中保存着一个HTML 元素（document.getElementById("someElement");），那么就意味着该元素将无法被销毁。
+function assignHandler(){
+ var element = document.getElementById("someElement");
+ var id = element.id;
+
+ element.onclick = function(){
+ alert(id);
+ };
+
+ element = null;
+} 
+在上面的代码中，通过把 element.id 的一个副本保存在一个变量中，并且在闭包中引用该变量消
+除了循环引用。但仅仅做到这一步，还是不能解决内存泄漏的问题。必须要记住：闭包会引用包含函数
+的整个活动对象，而其中包含着 element。即使闭包不直接引用 element，包含函数的活动对象中也
+仍然会保存一个引用。因此，有必要把 element 变量设置为 null。这样就能够解除对 DOM 对象的引
+用，顺利地减少其引用数，确保正常回收其占用的内存。
 
 
 
